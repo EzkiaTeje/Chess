@@ -1,23 +1,24 @@
 extends CharacterBody2D
 
 
-@export var sprite_node: Sprite2D
+@export var _sprite: Sprite2D
 
 var piece_type: Globals.PIECE_TYPES
 var piece_color: Globals.PIECE_COLORS
-var piece_position: Vector2i
+
+var _tilesheet = load("res://assets/pieces_tilesheet.png")
 
 
-func _ready() -> void:
-	pass
-
-
-func init_piece(col: Globals.PIECE_COLORS, ty: Globals.PIECE_TYPES, pos: Vector2i):
-	piece_type = ty
-	piece_color = col
-	piece_position = pos
-	position = pos * 16
+func init_piece(starting_position: Array):
+	# Variables for later
+	piece_type = starting_position[1]
+	piece_color = starting_position[0]
 	
-	sprite_node.texture = load("res://assets/pieces_tilesheet.png")
-	sprite_node.region_enabled = true
-	sprite_node.region_rect = Rect2(Globals.SPRITE_MAPPING[col][ty].x * 16, Globals.SPRITE_MAPPING[col][ty].y * 16, 16, 16)
+	# Move to board position
+	position.x = starting_position[2] * 16
+	position.y = starting_position[3] * 16
+	
+	# Select sprite
+	_sprite.texture = _tilesheet
+	_sprite.region_enabled = true
+	_sprite.region_rect = Rect2(Globals.SPRITE_MAPPING[piece_color][piece_type].x * 16, Globals.SPRITE_MAPPING[piece_color][piece_type].y * 16, 16, 16)

@@ -14,6 +14,11 @@ config/name="Chess"
 run/main_scene="uid://cdpn5lus5sxql"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
 [layer_names]
 
 2d_physics/layer_1="Board"
