@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://cdpn5lus5sxql"]
+
+[ext_resource type="Script" uid="uid://df04ccx5y0y20" path="res://scenes/main/main.gd" id="1_hyk8p"]
+
+[node name="Main" type="Node" unique_id=457156666]
+script = ExtResource("1_hyk8p")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1929491099]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -23.5
+offset_top = -33.0
+offset_right = 23.5
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 20
+metadata/_edit_use_anchors_ = true
+
+[node name="Play" type="Button" parent="VBoxContainer" unique_id=1839575465]
+layout_mode = 2
+text = "PLAY"
+
+[node name="Exit" type="Button" parent="VBoxContainer" unique_id=1549595605]
+layout_mode = 2
+text = "EXIT"
+
+[connection signal="pressed" from="VBoxContainer/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="VBoxContainer/Exit" to="." method="_on_exit_pressed"]
