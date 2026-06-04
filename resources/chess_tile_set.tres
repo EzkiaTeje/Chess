@@ -7,8 +7,6 @@
 texture = ExtResource("1_ycsyi")
 0:0/0 = 0
 1:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_urpq8"]
 texture = ExtResource("2_w1ti7")

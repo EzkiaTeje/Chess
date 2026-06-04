@@ -23,10 +23,12 @@ metadata/_edit_use_anchors_ = true
 
 [node name="Play" type="Button" parent="VBoxContainer" unique_id=1839575465]
 layout_mode = 2
+theme_override_font_sizes/font_size = 50
 text = "PLAY"
 
 [node name="Exit" type="Button" parent="VBoxContainer" unique_id=1549595605]
 layout_mode = 2
+theme_override_font_sizes/font_size = 50
 text = "EXIT"
 
 [connection signal="pressed" from="VBoxContainer/Play" to="." method="_on_play_pressed"]

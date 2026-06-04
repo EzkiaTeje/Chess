@@ -1,12 +1,9 @@
-extends CharacterBody2D
-
-
-@export var _sprite: Sprite2D
-
-var piece_type: Globals.PIECE_TYPES
-var piece_color: Globals.PIECE_COLORS
+class_name Piece
+extends Node2D
 
 var _tilesheet = load("res://assets/pieces_tilesheet.png")
+var piece_type: Globals.PIECE_TYPES
+var piece_color: Globals.PIECE_COLORS
 
 
 func init_piece(starting_position: Array):
@@ -19,6 +16,11 @@ func init_piece(starting_position: Array):
 	position.y = starting_position[3] * 16
 	
 	# Select sprite
-	_sprite.texture = _tilesheet
-	_sprite.region_enabled = true
-	_sprite.region_rect = Rect2(Globals.SPRITE_MAPPING[piece_color][piece_type].x * 16, Globals.SPRITE_MAPPING[piece_color][piece_type].y * 16, 16, 16)
+	$Sprite2D.texture = _tilesheet
+	$Sprite2D.region_enabled = true
+	$Sprite2D.region_rect = Rect2(Globals.SPRITE_MAPPING[piece_color][piece_type].x * 16, Globals.SPRITE_MAPPING[piece_color][piece_type].y * 16, 16, 16)
+
+
+func move_piece(new_position: Vector2i):
+	position.x = new_position.x * 16
+	position.y = new_position.y * 16

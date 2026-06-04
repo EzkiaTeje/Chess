@@ -6,8 +6,10 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_huli3"]
 size = Vector2(16, 16)
 
-[node name="Piece" type="Node2D" unique_id=318776983]
+[node name="Piece" type="Node2D" unique_id=318776983 node_paths=PackedStringArray("_sprite", "_area")]
 script = ExtResource("1_87r1p")
+_sprite = NodePath("Sprite2D")
+_area = NodePath("Area2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=739418357]
 texture = ExtResource("2_huli3")
