@@ -11,7 +11,7 @@ func _ready() -> void:
 	$Sprite2D.texture = _tilesheet
 
 
-func init_piece(starting_position: Array):
+func init_piece(starting_position: Array) -> void:
 	piece_type = starting_position[1]
 	piece_color = starting_position[0]
 	position.x = starting_position[2] * Globals.CELL_SIZE
@@ -20,7 +20,7 @@ func init_piece(starting_position: Array):
 	_update_sprite()
 
 
-func _update_sprite():
+func _update_sprite() -> void:
 	$Sprite2D.region_enabled = true
 	$Sprite2D.region_rect = Rect2(Globals.SPRITE_MAPPING[piece_color][piece_type].x * Globals.CELL_SIZE,
 		Globals.SPRITE_MAPPING[piece_color][piece_type].y * Globals.CELL_SIZE, Globals.CELL_SIZE, Globals.CELL_SIZE)

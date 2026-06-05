@@ -4,8 +4,8 @@ extends Node2D
 @onready var _turn_label = $CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn
 
 var _piece_scene = preload("res://scenes/piece/piece.tscn")
-var _pieces: Array[Piece]
-var _selected_piece: Piece
+var pieces: Array[Piece]
+var selected_piece: Piece
 var _current_turn := Globals.PIECE_COLORS.WHITE
 
 
@@ -16,7 +16,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		return
-	if not _selected_piece:
+	if not selected_piece:
 		return
 
 	var board_clicked_position := _get_board_position()
@@ -32,7 +32,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _try_eating(board_clicked_position):
 		return
 
-	_selected_piece.move_piece(board_clicked_position)	
+	selected_piece.move_piece(board_clicked_position)	
 	_deselect()
 	_switch_turn()
 
@@ -45,49 +45,42 @@ func _get_board_position() -> Vector2i:
 
 
 func _is_own_square(board_clicked_position: Vector2i) -> bool:
-	return board_clicked_position == Vector2i(_selected_piece.position / Globals.CELL_SIZE)
+	return board_clicked_position == Vector2i(selected_piece.position / Globals.CELL_SIZE)
 
 
 func _try_eating(board_clicked_position: Vector2i) -> bool:
-	for piece in _pieces:
-		if piece == _selected_piece:
+	for piece in pieces:
+		if piece == selected_piece:
 			continue
 		if Vector2i(piece.position / Globals.CELL_SIZE) != board_clicked_position:
 			continue
 
-		if piece.piece_color == _selected_piece.piece_color:
+		if piece.piece_color == selected_piece.piece_color:
 			return true
 
 		if piece.piece_type == Globals.PIECE_TYPES.KING:
 			_end_game(piece.piece_color)
 			piece.queue_free()
-			_pieces.erase(piece)
-			_selected_piece.move_piece(board_clicked_position)
+			pieces.erase(piece)
+			selected_piece.move_piece(board_clicked_position)
 			_deselect()
 			process_mode = Node.PROCESS_MODE_DISABLED
 			return true
 
 		piece.queue_free()
-		_pieces.erase(piece)
+		pieces.erase(piece)
 		return false
 
 	return false
 
 
 func _is_correct_movement(board_clicked_position: Vector2i) -> bool:
-	var start_position := Vector2i(_selected_piece.position / Globals.CELL_SIZE)
+	var start_position := Vector2i(selected_piece.position / Globals.CELL_SIZE)
 	var movement_delta := board_clicked_position - start_position
 
-	print("Piece type: ", _selected_piece.piece_type)
-	print("Piece color: ", _selected_piece.piece_color)
-	print("Clicked position: ", board_clicked_position)
-	print("Start position: ", start_position)
-	print("Delta: ", movement_delta)
-	print("------------------------------")
-
-	match _selected_piece.piece_type:
+	match selected_piece.piece_type:
 		Globals.PIECE_TYPES.PAWN:
-			if MovementRules.is_pawn_movement_correct(movement_delta, _selected_piece):
+			if MovementRules.is_pawn_movement_correct(movement_delta, board_clicked_position, selected_piece, pieces):
 				return true
 		Globals.PIECE_TYPES.ROOK:
 			if MovementRules.is_rook_movement_correct(movement_delta):
@@ -108,40 +101,26 @@ func _is_correct_movement(board_clicked_position: Vector2i) -> bool:
 
 
 func _is_piece_blocked(board_clicked_position: Vector2i) -> bool:
-	var start_position := Vector2i(_selected_piece.position / Globals.CELL_SIZE)
+	var start_position := Vector2i(selected_piece.position / Globals.CELL_SIZE)
 	var movement_delta := board_clicked_position - start_position
-	
-	match _selected_piece.piece_type:
+
+	match selected_piece.piece_type:
 		Globals.PIECE_TYPES.PAWN:
-			if _selected_piece.piece_color == Globals.PIECE_COLORS.WHITE:
-				return _is_square_occupied(Vector2i(start_position.x, start_position.y - 1))
-			else:
-				return _is_square_occupied(Vector2i(start_position.x, start_position.y + 1))
-				
+			if MovementRules.is_pawn_movement_occupied(start_position, selected_piece, pieces):
+				return true
 		Globals.PIECE_TYPES.ROOK, Globals.PIECE_TYPES.BISHOP, Globals.PIECE_TYPES.QUEEN:
-			var step := Vector2i(sign(movement_delta.x), sign(movement_delta.y))
-			var current := start_position + step
-			while current != board_clicked_position:
-				if _is_square_occupied(current):
-					return true
-				current += step
-
-		#Globals.PIECE_TYPES.PAWN:
-			#if MovementRules.is_pawn_movement_occupied():
-				#return true
-		#Globals.PIECE_TYPES.ROOK, Globals.PIECE_TYPES.BISHOP, Globals.PIECE_TYPES.QUEEN:
-			#if MovementRules.is_rook_bishop_queen_movement_occupied():
-				#return true
+			if MovementRules.is_rook_bishop_queen_movement_occupied(board_clicked_position, start_position, movement_delta, selected_piece, pieces):
+				return true
 	return false
 
-
-func _is_square_occupied(grid_pos: Vector2i) -> bool:
-	for piece in _pieces:
-		if piece == _selected_piece:
-			continue
-		if Vector2i(piece.position / Globals.CELL_SIZE) == grid_pos:
-			return true
-	return false
+#
+#func _is_square_occupied(board_position: Vector2i) -> bool:
+	#for piece in pieces:
+		#if piece == selected_piece:
+			#continue
+		#if Vector2i(piece.position / Globals.CELL_SIZE) == board_position:
+			#return true
+	#return false
 
 
 func _end_game(lost_color: int) -> void:
@@ -150,9 +129,9 @@ func _end_game(lost_color: int) -> void:
 
 
 func _deselect() -> void:
-	if _selected_piece:
-		_selected_piece.modulate = Color.WHITE
-	_selected_piece = null
+	if selected_piece:
+		selected_piece.modulate = Color.WHITE
+	selected_piece = null
 
 
 func _switch_turn() -> void:
@@ -170,7 +149,7 @@ func _create_pieces():
 	for i in range(Globals.TOTAL_PIECES):
 		var piece_instance = _piece_scene.instantiate()
 		add_child(piece_instance)
-		_pieces.append(piece_instance)
+		pieces.append(piece_instance)
 		piece_instance.init_piece(Globals.STARTING_POSITIONS[i])
 		piece_instance.get_node("Area2D").input_event.connect(_on_piece_clicked.bind(piece_instance))
 
@@ -180,13 +159,12 @@ func _on_piece_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, piec
 		if piece.piece_color != _current_turn:
 			return
 		
-		if _selected_piece == piece:
-			_selected_piece.modulate = Color.WHITE
-			_selected_piece = null
+		if selected_piece == piece:
+			_deselect()
 			return
 		
-		if _selected_piece:
-			_selected_piece.modulate = Color.WHITE
+		if selected_piece:
+			_deselect()
 		
-		_selected_piece = piece
-		_selected_piece.modulate = Color.GREEN
+		selected_piece = piece
+		selected_piece.modulate = Color.GREEN

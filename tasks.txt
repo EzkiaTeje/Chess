@@ -1,8 +1,10 @@
-clean code on game.gd to movement_rules.gd
-Pawn only eat in diagonal
 Indicator for piece type movement (on unit selection)
 Time for both
 Game start button
 Escape menu
+Jaque
+Jaque mate
+Forbid king going into Jaque
+Sound and music
 AI
 ¿MULTIPLAYER?
