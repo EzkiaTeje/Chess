@@ -1,6 +1,10 @@
-Piece type movement
+Clean code on game.gd
+Unit collisions except for horse
+Horse can jump
+Pawn only eat in diagonal
 Indicator for piece type movement
 Time for both
+Game start button
 Escape menu
 AI
 ¿MULTIPLAYER?

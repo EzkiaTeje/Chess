@@ -1,11 +1,12 @@
 extends Node2D
 
 
+@onready var _turn_label = $CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn
+
 var _piece_scene = preload("res://scenes/piece/piece.tscn")
 var _pieces: Array[Piece]
 var _selected_piece: Piece
 var _current_turn := Globals.PIECE_COLORS.WHITE
-@onready var _turn_label = $CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn
 
 
 func _ready() -> void:
@@ -24,15 +25,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if _is_own_square(board_clicked_position):
 		return
-
+	if !_is_correct_movement(board_clicked_position):
+		return
 	if _try_eating(board_clicked_position):
 		return
 
-	# Movimiento correcto por piezas aquí.
-	if !_is_correct_movement(board_clicked_position):
-		return
-
-	_selected_piece.move_piece(board_clicked_position)
+	_selected_piece.move_piece(board_clicked_position)	
 	_deselect()
 	_switch_turn()
 
@@ -74,9 +72,37 @@ func _try_eating(board_clicked_position: Vector2i) -> bool:
 	return false
 
 
-# Movimiento correcto por piezas aquí
 func _is_correct_movement(board_clicked_position: Vector2i) -> bool:
-	return true
+	var start_position := Vector2i(_selected_piece.position / Globals.CELL_SIZE)
+	var movement_delta := board_clicked_position - start_position
+
+	print("Piece type: ", _selected_piece.piece_type)
+	print("Piece color: ", _selected_piece.piece_color)
+	print("Clicked position: ", board_clicked_position)
+	print("Start position: ", start_position)
+	print("Delta: ", movement_delta)
+	print("------------------------------")
+
+	match _selected_piece.piece_type:
+		Globals.PIECE_TYPES.PAWN:
+			if MovementRules.is_pawn_movement_correct(movement_delta, _selected_piece):
+				return true
+		Globals.PIECE_TYPES.ROOK:
+			if MovementRules.is_rook_movement_correct(movement_delta):
+				return true
+		Globals.PIECE_TYPES.KNIGHT:
+			if MovementRules.is_knight_movement_correct(movement_delta):
+				return true
+		Globals.PIECE_TYPES.BISHOP:
+			if MovementRules.is_bishop_movement_correct(movement_delta):
+				return true
+		Globals.PIECE_TYPES.KING:
+			if MovementRules.is_king_movement_correct(movement_delta):
+				return true
+		Globals.PIECE_TYPES.QUEEN:
+			if MovementRules.is_queen_movement_correct(movement_delta):
+				return true
+	return false
 
 
 func _end_game(lost_color: int) -> void:
@@ -125,4 +151,3 @@ func _on_piece_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, piec
 		
 		_selected_piece = piece
 		_selected_piece.modulate = Color.GREEN
-		

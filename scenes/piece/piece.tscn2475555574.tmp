@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bsyedvvu4er86"]
+
+[ext_resource type="Script" uid="uid://b4vl7afv3i67q" path="res://scenes/piece/piece.gd" id="1_87r1p"]
+[ext_resource type="Texture2D" uid="uid://cyqgeh6480r10" path="res://assets/pieces_tilesheet.png" id="2_huli3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_huli3"]
+size = Vector2(16, 16)
+
+[node name="Piece" type="Node2D" unique_id=318776983]
+script = ExtResource("1_87r1p")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=739418357]
+texture = ExtResource("2_huli3")
+centered = false
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1580382247]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=196521293]
+position = Vector2(8, 8)
+shape = SubResource("RectangleShape2D_huli3")

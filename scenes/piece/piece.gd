@@ -14,10 +14,9 @@ func _ready() -> void:
 func init_piece(starting_position: Array):
 	piece_type = starting_position[1]
 	piece_color = starting_position[0]
-	
 	position.x = starting_position[2] * Globals.CELL_SIZE
 	position.y = starting_position[3] * Globals.CELL_SIZE
-	
+
 	_update_sprite()
 
 

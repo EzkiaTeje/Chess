@@ -3,7 +3,6 @@ class_name Globals
 extends Node
 
 
-
 enum PIECE_COLORS {
 	BLACK,
 	WHITE
