@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://c1b8l6bm4qgwy"]
+
+[ext_resource type="Script" uid="uid://c73jyfe3lax7j" path="res://scenes/game/game.gd" id="1_7h61r"]
+[ext_resource type="PackedScene" uid="uid://bhyhpdrjs51hw" path="res://scenes/board/board.tscn" id="1_sul5r"]
+[ext_resource type="PackedScene" uid="uid://n5jm603uorlm" path="res://scenes/interface/interface.tscn" id="3_0sr1o"]
+
+[node name="Game" type="Node2D" unique_id=1638847579]
+script = ExtResource("1_7h61r")
+
+[node name="Board" parent="." unique_id=786211278 instance=ExtResource("1_sul5r")]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=929294303]
+position = Vector2(64, 64)
+zoom = Vector2(5, 5)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1596722434]
+
+[node name="Interface" parent="CanvasLayer" unique_id=23302039 instance=ExtResource("3_0sr1o")]
+metadata/_edit_use_anchors_ = true

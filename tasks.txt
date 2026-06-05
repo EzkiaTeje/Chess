@@ -1,5 +1,3 @@
-Fix possible movement outside the board
-Clean the code
 Piece type movement
 Indicator for piece type movement
 Time for both
