@@ -18,6 +18,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 
 		var board_position := Vector2i(get_local_mouse_position() / 16)
+		if board_position == Vector2i(selected_piece.position / 16):
+			return
+
 		for piece in pieces:
 			if piece != selected_piece and Vector2i(piece.position / 16) == board_position:
 				if piece.piece_color == selected_piece.piece_color:
@@ -27,6 +30,7 @@ func _unhandled_input(event: InputEvent) -> void:
 						$CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn.text = "BLACK WON"
 					else:
 						$CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn.text = "WHITE WON"
+						$CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn.text = "BLACK WON"
 					piece.queue_free()
 					pieces.erase(piece)
 					selected_piece.move_piece(board_position)
@@ -44,9 +48,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		if current_turn == Globals.PIECE_COLORS.BLACK:
 			current_turn = Globals.PIECE_COLORS.WHITE
 			$CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn.text = "WHITE'S TURN"
+			$CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn.modulate = Color.WHITE
 		else:
 			current_turn = Globals.PIECE_COLORS.BLACK
 			$CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn.text = "BLACK'S TURN"
+			$CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn.modulate = Color.BLACK
 
 
 func _create_pieces():
@@ -70,3 +76,4 @@ func _on_piece_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, piec
 			selected_piece.modulate = Color.WHITE
 		selected_piece = piece
 		selected_piece.modulate = Color.GREEN
+		
