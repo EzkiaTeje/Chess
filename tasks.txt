@@ -1,8 +1,6 @@
-Clean code on game.gd
-Unit collisions except for horse
-Horse can jump
+clean code on game.gd to movement_rules.gd
 Pawn only eat in diagonal
-Indicator for piece type movement
+Indicator for piece type movement (on unit selection)
 Time for both
 Game start button
 Escape menu

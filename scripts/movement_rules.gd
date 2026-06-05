@@ -8,6 +8,9 @@ static var _first_black_piece_moved := false
 
 
 static func is_pawn_movement_correct(movement_delta: Vector2i, selected_piece) -> bool:
+	# -------------------------------
+	# Pawn diagonal and eat movement.
+	# -------------------------------
 	if selected_piece.piece_color == Globals.PIECE_COLORS.WHITE:
 		if _first_white_piece_moved:
 			if movement_delta == Vector2i(0, -1):

@@ -27,6 +27,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if !_is_correct_movement(board_clicked_position):
 		return
+	if _is_piece_blocked(board_clicked_position):
+		return
 	if _try_eating(board_clicked_position):
 		return
 
@@ -102,6 +104,43 @@ func _is_correct_movement(board_clicked_position: Vector2i) -> bool:
 		Globals.PIECE_TYPES.QUEEN:
 			if MovementRules.is_queen_movement_correct(movement_delta):
 				return true
+	return false
+
+
+func _is_piece_blocked(board_clicked_position: Vector2i) -> bool:
+	var start_position := Vector2i(_selected_piece.position / Globals.CELL_SIZE)
+	var movement_delta := board_clicked_position - start_position
+	
+	match _selected_piece.piece_type:
+		Globals.PIECE_TYPES.PAWN:
+			if _selected_piece.piece_color == Globals.PIECE_COLORS.WHITE:
+				return _is_square_occupied(Vector2i(start_position.x, start_position.y - 1))
+			else:
+				return _is_square_occupied(Vector2i(start_position.x, start_position.y + 1))
+				
+		Globals.PIECE_TYPES.ROOK, Globals.PIECE_TYPES.BISHOP, Globals.PIECE_TYPES.QUEEN:
+			var step := Vector2i(sign(movement_delta.x), sign(movement_delta.y))
+			var current := start_position + step
+			while current != board_clicked_position:
+				if _is_square_occupied(current):
+					return true
+				current += step
+
+		#Globals.PIECE_TYPES.PAWN:
+			#if MovementRules.is_pawn_movement_occupied():
+				#return true
+		#Globals.PIECE_TYPES.ROOK, Globals.PIECE_TYPES.BISHOP, Globals.PIECE_TYPES.QUEEN:
+			#if MovementRules.is_rook_bishop_queen_movement_occupied():
+				#return true
+	return false
+
+
+func _is_square_occupied(grid_pos: Vector2i) -> bool:
+	for piece in _pieces:
+		if piece == _selected_piece:
+			continue
+		if Vector2i(piece.position / Globals.CELL_SIZE) == grid_pos:
+			return true
 	return false
 
 
