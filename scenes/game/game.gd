@@ -1,13 +1,14 @@
 extends Node2D
 
 
-@onready var _turn_label = $CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn
-
 signal turn_changed(turn: int)
+signal game_paused(paused: bool)
+signal game_ended(winner: String)
 
 var _piece_scene = preload("res://scenes/piece/piece.tscn")
 var pieces: Array[Piece]
 var selected_piece: Piece
+var _paused := false
 var _current_turn := Globals.PIECE_COLORS.WHITE
 var _valid_moves: Array[Vector2i] = []
 
@@ -17,6 +18,17 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		if _paused:
+			$CanvasLayer/PauseMenu.visible = false
+			get_tree().paused = false
+			_paused = !_paused
+		else:
+			$CanvasLayer/PauseMenu.visible = true
+			get_tree().paused = true
+			_paused = !_paused
+		return
+	
 	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		return
 	if not selected_piece:
@@ -35,7 +47,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _try_eating(board_clicked_position):
 		return
 
-	selected_piece.move_piece(board_clicked_position)	
+	selected_piece.move_piece(board_clicked_position)
+	MovementRules.check_pawn_to_queen(selected_piece)
 	_deselect()
 	_switch_turn()
 
@@ -66,6 +79,7 @@ func _try_eating(board_clicked_position: Vector2i) -> bool:
 			piece.queue_free()
 			pieces.erase(piece)
 			selected_piece.move_piece(board_clicked_position)
+			MovementRules.check_pawn_to_queen(selected_piece)
 			_deselect()
 			process_mode = Node.PROCESS_MODE_DISABLED
 			return true
@@ -119,8 +133,9 @@ func _is_piece_blocked(board_clicked_position: Vector2i) -> bool:
 
 
 func _end_game(lost_color: int) -> void:
-	var winner = "BLACK" if lost_color == Globals.PIECE_COLORS.WHITE else "WHITE"
-	_turn_label.text = winner + " WON"
+	var winner := "BLACK" if lost_color == Globals.PIECE_COLORS.WHITE else "WHITE"
+	game_ended.emit(winner)
+	print(winner + " WON")
 
 
 func _deselect() -> void:
@@ -134,14 +149,10 @@ func _deselect() -> void:
 func _switch_turn() -> void:
 	if _current_turn == Globals.PIECE_COLORS.BLACK:
 		_current_turn = Globals.PIECE_COLORS.WHITE
-		_turn_label.text = "WHITE'S TURN"
-		_turn_label.modulate = Color.WHITE
+		turn_changed.emit(_current_turn)
 	else:
 		_current_turn = Globals.PIECE_COLORS.BLACK
-		_turn_label.text = "BLACK'S TURN"
-		_turn_label.modulate = Color.BLACK
-
-	turn_changed.emit(_current_turn)
+		turn_changed.emit(_current_turn)
 
 
 func _create_pieces() -> void:

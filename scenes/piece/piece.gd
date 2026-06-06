@@ -17,10 +17,10 @@ func init_piece(starting_position: Array) -> void:
 	position.x = starting_position[2] * Globals.CELL_SIZE
 	position.y = starting_position[3] * Globals.CELL_SIZE
 
-	_update_sprite()
+	update_sprite()
 
 
-func _update_sprite() -> void:
+func update_sprite() -> void:
 	$Sprite2D.region_enabled = true
 	$Sprite2D.region_rect = Rect2(Globals.SPRITE_MAPPING[piece_color][piece_type].x * Globals.CELL_SIZE,
 		Globals.SPRITE_MAPPING[piece_color][piece_type].y * Globals.CELL_SIZE, Globals.CELL_SIZE, Globals.CELL_SIZE)

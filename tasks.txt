@@ -1,6 +1,3 @@
-Time for both
-Game start button
-Escape menu
 Jaque
 Jaque mate
 Forbid king going into Jaque

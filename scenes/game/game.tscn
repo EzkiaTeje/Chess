@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://c73jyfe3lax7j" path="res://scenes/game/game.gd" id="1_7h61r"]
 [ext_resource type="PackedScene" uid="uid://bhyhpdrjs51hw" path="res://scenes/board/board.tscn" id="1_sul5r"]
 [ext_resource type="PackedScene" uid="uid://n5jm603uorlm" path="res://scenes/interface/interface.tscn" id="3_0sr1o"]
+[ext_resource type="PackedScene" uid="uid://mvqkdq7vistp" path="res://scenes/pause_menu/pause_menu.tscn" id="4_kelw5"]
 
 [node name="Game" type="Node2D" unique_id=1638847579]
 script = ExtResource("1_7h61r")
@@ -18,3 +19,6 @@ zoom = Vector2(5, 5)
 
 [node name="Interface" parent="CanvasLayer" unique_id=23302039 instance=ExtResource("3_0sr1o")]
 metadata/_edit_use_anchors_ = true
+
+[node name="PauseMenu" parent="CanvasLayer" unique_id=1930855815 instance=ExtResource("4_kelw5")]
+visible = false
