@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://n5jm603uorlm"]
 
+[ext_resource type="Script" uid="uid://do6fd1rmi8jmm" path="res://scenes/interface/interface.gd" id="1_jrra2"]
+
 [node name="Interface" type="Control" unique_id=23302039]
 layout_mode = 3
 anchors_preset = 15
@@ -8,6 +10,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+script = ExtResource("1_jrra2")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1165313590]
 layout_mode = 1
@@ -20,14 +23,14 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="WhiteTime" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1201119581]
+[node name="WhiteTimeLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1201119581]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "3:00"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BlackTime" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1937149186]
+[node name="BlackTimeLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1937149186]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 40
@@ -41,3 +44,7 @@ theme_override_font_sizes/font_size = 30
 text = "WHITE'S TURN"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="WhiteTimer" type="Timer" parent="." unique_id=1568876566]
+
+[node name="BlackTimer" type="Timer" parent="." unique_id=1549865770]

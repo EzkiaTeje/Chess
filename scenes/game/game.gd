@@ -3,10 +3,13 @@ extends Node2D
 
 @onready var _turn_label = $CanvasLayer/Interface/MarginContainer/VBoxContainer/Turn
 
+signal turn_changed(turn: int)
+
 var _piece_scene = preload("res://scenes/piece/piece.tscn")
 var pieces: Array[Piece]
 var selected_piece: Piece
 var _current_turn := Globals.PIECE_COLORS.WHITE
+var _valid_moves: Array[Vector2i] = []
 
 
 func _ready() -> void:
@@ -25,7 +28,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if _is_own_square(board_clicked_position):
 		return
-	if !_is_correct_movement(board_clicked_position):
+	if not _is_correct_movement(board_clicked_position):
 		return
 	if _is_piece_blocked(board_clicked_position):
 		return
@@ -106,21 +109,13 @@ func _is_piece_blocked(board_clicked_position: Vector2i) -> bool:
 
 	match selected_piece.piece_type:
 		Globals.PIECE_TYPES.PAWN:
-			if MovementRules.is_pawn_movement_occupied(start_position, selected_piece, pieces):
-				return true
+			if movement_delta.y != 0 and movement_delta.x == 0:
+				if MovementRules.is_pawn_movement_occupied(start_position, selected_piece, pieces):
+					return true
 		Globals.PIECE_TYPES.ROOK, Globals.PIECE_TYPES.BISHOP, Globals.PIECE_TYPES.QUEEN:
 			if MovementRules.is_rook_bishop_queen_movement_occupied(board_clicked_position, start_position, movement_delta, selected_piece, pieces):
 				return true
 	return false
-
-#
-#func _is_square_occupied(board_position: Vector2i) -> bool:
-	#for piece in pieces:
-		#if piece == selected_piece:
-			#continue
-		#if Vector2i(piece.position / Globals.CELL_SIZE) == board_position:
-			#return true
-	#return false
 
 
 func _end_game(lost_color: int) -> void:
@@ -132,6 +127,8 @@ func _deselect() -> void:
 	if selected_piece:
 		selected_piece.modulate = Color.WHITE
 	selected_piece = null
+	_valid_moves.clear()
+	queue_redraw()
 
 
 func _switch_turn() -> void:
@@ -144,8 +141,10 @@ func _switch_turn() -> void:
 		_turn_label.text = "BLACK'S TURN"
 		_turn_label.modulate = Color.BLACK
 
+	turn_changed.emit(_current_turn)
 
-func _create_pieces():
+
+func _create_pieces() -> void:
 	for i in range(Globals.TOTAL_PIECES):
 		var piece_instance = _piece_scene.instantiate()
 		add_child(piece_instance)
@@ -156,15 +155,97 @@ func _create_pieces():
 
 func _on_piece_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, piece: Piece) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if piece not in pieces:
+			return
+
 		if piece.piece_color != _current_turn:
 			return
 		
 		if selected_piece == piece:
 			_deselect()
 			return
-		
+
 		if selected_piece:
-			_deselect()
-		
+			selected_piece.modulate = Color.WHITE
+
 		selected_piece = piece
 		selected_piece.modulate = Color.GREEN
+
+		_valid_moves = _get_valid_moves_for(selected_piece)
+		queue_redraw()    
+
+
+func _draw() -> void:
+	for pos in _valid_moves:
+		draw_rect(Rect2(pos * Globals.CELL_SIZE, Vector2(Globals.CELL_SIZE, Globals.CELL_SIZE)), Color.GREEN, false, 2.0)
+
+
+func _get_valid_moves_for(piece: Piece) -> Array[Vector2i]:
+	var valid_moves: Array[Vector2i] = []
+	var start_position = Vector2i(selected_piece.position / Globals.CELL_SIZE)
+	var directions: Array[Vector2i]
+	var sliding := false
+	
+	match piece.piece_type:
+		Globals.PIECE_TYPES.PAWN:
+			_add_pawn_moves(start_position, piece, valid_moves)
+			return valid_moves
+		Globals.PIECE_TYPES.ROOK:
+			directions = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1)]
+			sliding = true
+		Globals.PIECE_TYPES.KNIGHT:
+			directions = [Vector2i(1,2), Vector2i(2,1), Vector2i(2,-1), Vector2i(1,-2), Vector2i(-1,-2), Vector2i(-2,-1), Vector2i(-2,1), Vector2i(-1,2)]
+		Globals.PIECE_TYPES.BISHOP:
+			directions = [Vector2i(1,1), Vector2i(1,-1), Vector2i(-1,1), Vector2i(-1,-1)]
+			sliding = true
+		Globals.PIECE_TYPES.KING:
+			directions = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1), Vector2i(1,1), Vector2i(1,-1), Vector2i(-1,1), Vector2i(-1,-1)]
+		Globals.PIECE_TYPES.QUEEN:
+			directions = [Vector2i(1,0), Vector2i(-1,0), Vector2i(0,1), Vector2i(0,-1), Vector2i(1,1), Vector2i(1,-1), Vector2i(-1,1), Vector2i(-1,-1)]
+			sliding = true
+
+	# For non pawns
+	for direction in directions:
+		if sliding:
+			var i := 1
+			while true:
+				var to = start_position + direction * i
+				if not Rect2i(0, 0, 8, 8).has_point(to):
+					break
+				if MovementRules.is_square_occupied_by_ally(to, piece, pieces):
+					break
+				valid_moves.append(to)
+				if MovementRules.is_square_occupied_by_rival(to, piece, pieces):
+					break
+				i += 1
+		else:
+			var to = start_position + direction
+			if not Rect2i(0, 0, 8, 8).has_point(to):
+				continue
+			if MovementRules.is_square_occupied_by_ally(to, piece, pieces):
+				continue
+			valid_moves.append(to)
+
+	return valid_moves
+
+
+func _add_pawn_moves(start_position: Vector2i, piece: Piece, valid_moves: Array[Vector2i]):
+	var dir := -1 if piece.piece_color == Globals.PIECE_COLORS.WHITE else 1
+	var start_row := 6 if piece.piece_color == Globals.PIECE_COLORS.WHITE else 1
+	var forward = Vector2i(0, dir)
+	
+	# One step forward
+	var one_step = start_position + forward
+	if Rect2i(0, 0, 8, 8).has_point(one_step) and not MovementRules.is_square_occupied(one_step, piece, pieces):
+		valid_moves.append(one_step)
+		# Two steps forward if on starting row
+		if start_position.y == start_row:
+			var two_step = start_position + forward * 2
+			if not MovementRules.is_square_occupied(two_step, piece, pieces):
+				valid_moves.append(two_step)
+	
+	# Diagonal eats
+	for dx in [-1, 1]:
+		var diag = start_position + Vector2i(dx, dir)
+		if Rect2i(0, 0, 8, 8).has_point(diag) and MovementRules.is_square_occupied_by_rival(diag, piece, pieces):
+			valid_moves.append(diag)

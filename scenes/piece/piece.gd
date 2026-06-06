@@ -26,6 +26,6 @@ func _update_sprite() -> void:
 		Globals.SPRITE_MAPPING[piece_color][piece_type].y * Globals.CELL_SIZE, Globals.CELL_SIZE, Globals.CELL_SIZE)
 
 
-func move_piece(new_position: Vector2i):
+func move_piece(new_position: Vector2i) -> void:
 	position.x = new_position.x * Globals.CELL_SIZE
 	position.y = new_position.y * Globals.CELL_SIZE

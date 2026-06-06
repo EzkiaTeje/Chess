@@ -8,6 +8,7 @@
 script = ExtResource("1_7h61r")
 
 [node name="Board" parent="." unique_id=786211278 instance=ExtResource("1_sul5r")]
+z_index = -1
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=929294303]
 position = Vector2(64, 64)
