@@ -4,18 +4,21 @@ extends Control
 @onready var white_time_label = $MarginContainer/VBoxContainer/WhiteTimeLabel
 @onready var black_time_label = $MarginContainer/VBoxContainer/BlackTimeLabel
 @onready var turn_label = $MarginContainer/VBoxContainer/Turn
+@onready var check_label = $MarginContainer/VBoxContainer/Check
 
-var _white_time := 180
-var _black_time := 180
+var _white_time := 10 # 180
+var _black_time := 10 # 180
 
 
 func _ready() -> void:
 	var game_node = get_node("/root/Game")
 	game_node.turn_changed.connect(_on_turn_changed)
+	game_node.king_checked.connect(_on_king_checked)
 	game_node.game_ended.connect(_on_game_ended)
 
 
 func _on_turn_changed(turn: int) -> void:
+	check_label.visible = false
 	if turn == Globals.PIECE_COLORS.WHITE:
 		$BlackTimer.stop()
 		$WhiteTimer.start()
@@ -28,11 +31,24 @@ func _on_turn_changed(turn: int) -> void:
 		turn_label.add_theme_color_override("font_color", Color.BLACK)
 
 
+func _on_king_checked(color: int) -> void:
+	if color == Globals.PIECE_COLORS.WHITE:
+		check_label.add_theme_color_override("font_color", Color.WHITE)
+	else:
+		check_label.add_theme_color_override("font_color", Color.BLACK)
+	check_label.visible = !check_label.visible
+
+
 func _on_game_ended(winner: String) -> void:
 	if winner == "WHITE":
 		turn_label.text = "WHITE WON!"
+		turn_label.add_theme_color_override("font_color", Color.WHITE)
 	else:
 		turn_label.text = "BLACK WON!"
+		turn_label.add_theme_color_override("font_color", Color.BLACK)
+	get_node("/root/Game").game_over = true
+	$WhiteTimer.stop()
+	$BlackTimer.stop()
 
 
 func _on_start_button_pressed() -> void:
@@ -58,3 +74,7 @@ func _update_display() -> void:
 	minutes = _black_time / 60.0
 	seconds = _black_time % 60
 	black_time_label.text = "%d:%02d" % [minutes, seconds]
+	if _white_time <= 0:
+		_on_game_ended("BLACK")
+	elif _black_time <= 0:
+		_on_game_ended("WHITE")

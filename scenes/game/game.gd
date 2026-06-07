@@ -2,13 +2,13 @@ extends Node2D
 
 
 signal turn_changed(turn: int)
-signal game_paused(paused: bool)
+signal king_checked()
 signal game_ended(winner: String)
 
 var _piece_scene = preload("res://scenes/piece/piece.tscn")
 var pieces: Array[Piece]
 var selected_piece: Piece
-var _paused := false
+var game_over := false
 var _current_turn := Globals.PIECE_COLORS.WHITE
 var _valid_moves: Array[Vector2i] = []
 
@@ -18,15 +18,7 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		if _paused:
-			$CanvasLayer/PauseMenu.visible = false
-			get_tree().paused = false
-			_paused = !_paused
-		else:
-			$CanvasLayer/PauseMenu.visible = true
-			get_tree().paused = true
-			_paused = !_paused
+	if game_over:
 		return
 	
 	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
@@ -81,7 +73,6 @@ func _try_eating(board_clicked_position: Vector2i) -> bool:
 			selected_piece.move_piece(board_clicked_position)
 			MovementRules.check_pawn_to_queen(selected_piece)
 			_deselect()
-			process_mode = Node.PROCESS_MODE_DISABLED
 			return true
 
 		piece.queue_free()
@@ -135,7 +126,7 @@ func _is_piece_blocked(board_clicked_position: Vector2i) -> bool:
 func _end_game(lost_color: int) -> void:
 	var winner := "BLACK" if lost_color == Globals.PIECE_COLORS.WHITE else "WHITE"
 	game_ended.emit(winner)
-	print(winner + " WON")
+	game_over = true
 
 
 func _deselect() -> void:
@@ -149,10 +140,62 @@ func _deselect() -> void:
 func _switch_turn() -> void:
 	if _current_turn == Globals.PIECE_COLORS.BLACK:
 		_current_turn = Globals.PIECE_COLORS.WHITE
-		turn_changed.emit(_current_turn)
 	else:
 		_current_turn = Globals.PIECE_COLORS.BLACK
-		turn_changed.emit(_current_turn)
+	turn_changed.emit(_current_turn)
+
+	if _current_turn == Globals.PIECE_COLORS.WHITE:
+		var white_king
+		for piece in pieces:
+			if piece.piece_type == Globals.PIECE_TYPES.KING and piece.piece_color == Globals.PIECE_COLORS.WHITE:
+				white_king = piece
+				break
+		if _is_king_in_check(_current_turn, white_king):
+			king_checked.emit(Globals.PIECE_COLORS.WHITE)
+			print("CHECK")
+	if _current_turn == Globals.PIECE_COLORS.BLACK:
+		var black_king
+		for piece in pieces:
+			if piece.piece_type == Globals.PIECE_TYPES.KING and piece.piece_color == Globals.PIECE_COLORS.BLACK:
+				black_king = piece
+				break
+		if _is_king_in_check(_current_turn, black_king):
+			king_checked.emit(Globals.PIECE_COLORS.BLACK)
+			print("CHECK")
+
+
+func _is_king_in_check(king_color: int, king: Piece) -> bool:
+	if not king:
+		return false
+	var king_position := Vector2i(king.position / Globals.CELL_SIZE)
+
+	for piece in pieces:
+		if piece.piece_color == king_color:
+			continue
+		var delta := king_position - Vector2i(piece.position / Globals.CELL_SIZE)
+
+		match piece.piece_type:
+			Globals.PIECE_TYPES.PAWN:
+				var dir := -1 if piece.piece_color == Globals.PIECE_COLORS.WHITE else 1
+				if abs(delta.x) == 1 and delta.y == dir:
+					return true
+			Globals.PIECE_TYPES.KNIGHT:
+				if MovementRules.is_knight_movement_correct(delta):
+					return true
+			Globals.PIECE_TYPES.ROOK:
+				if MovementRules.is_rook_movement_correct(delta) \
+				and not MovementRules.is_rook_bishop_queen_movement_occupied(king_position, Vector2i(piece.position / Globals.CELL_SIZE), delta, piece, pieces):
+					return true
+			Globals.PIECE_TYPES.BISHOP:
+				if MovementRules.is_bishop_movement_correct(delta) \
+				and not MovementRules.is_rook_bishop_queen_movement_occupied(king_position, Vector2i(piece.position / Globals.CELL_SIZE), delta, piece, pieces):
+					return true
+			Globals.PIECE_TYPES.QUEEN:
+				if MovementRules.is_queen_movement_correct(delta) \
+				and not MovementRules.is_rook_bishop_queen_movement_occupied(king_position, Vector2i(piece.position / Globals.CELL_SIZE), delta, piece, pieces):
+					return true
+
+	return false
 
 
 func _create_pieces() -> void:
@@ -165,6 +208,9 @@ func _create_pieces() -> void:
 
 
 func _on_piece_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, piece: Piece) -> void:
+	if game_over:
+		return
+	
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if piece not in pieces:
 			return
@@ -193,7 +239,7 @@ func _draw() -> void:
 
 func _get_valid_moves_for(piece: Piece) -> Array[Vector2i]:
 	var valid_moves: Array[Vector2i] = []
-	var start_position = Vector2i(selected_piece.position / Globals.CELL_SIZE)
+	var start_position = Vector2i(piece.position / Globals.CELL_SIZE)
 	var directions: Array[Vector2i]
 	var sliding := false
 	

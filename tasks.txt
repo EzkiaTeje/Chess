@@ -1,6 +1,5 @@
-Jaque
-Jaque mate
-Forbid king going into Jaque
 Sound and music
-AI
-¿MULTIPLAYER?
+
+--- Extra ---
+AI?
+MULTIPLAYER?

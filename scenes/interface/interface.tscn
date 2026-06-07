@@ -49,6 +49,15 @@ text = "WHITE TURN"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Check" type="Label" parent="MarginContainer/VBoxContainer" unique_id=69987484]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "CHECK"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="WhiteTimer" type="Timer" parent="." unique_id=1568876566]
 
 [node name="BlackTimer" type="Timer" parent="." unique_id=1549865770]

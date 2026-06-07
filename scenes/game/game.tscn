@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://mvqkdq7vistp" path="res://scenes/pause_menu/pause_menu.tscn" id="4_kelw5"]
 
 [node name="Game" type="Node2D" unique_id=1638847579]
+process_mode = 1
 script = ExtResource("1_7h61r")
 
 [node name="Board" parent="." unique_id=786211278 instance=ExtResource("1_sul5r")]
@@ -21,4 +22,5 @@ zoom = Vector2(5, 5)
 metadata/_edit_use_anchors_ = true
 
 [node name="PauseMenu" parent="CanvasLayer" unique_id=1930855815 instance=ExtResource("4_kelw5")]
+process_mode = 3
 visible = false
