@@ -4,6 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://bhyhpdrjs51hw" path="res://scenes/board/board.tscn" id="1_sul5r"]
 [ext_resource type="PackedScene" uid="uid://n5jm603uorlm" path="res://scenes/interface/interface.tscn" id="3_0sr1o"]
 [ext_resource type="PackedScene" uid="uid://mvqkdq7vistp" path="res://scenes/pause_menu/pause_menu.tscn" id="4_kelw5"]
+[ext_resource type="AudioStream" uid="uid://cgk857spbrby4" path="res://assets/czerny.mp3" id="5_lfrn8"]
+[ext_resource type="AudioStream" uid="uid://cjfehmrlv3gir" path="res://assets/pick_piece.mp3" id="6_bdhmt"]
+[ext_resource type="AudioStream" uid="uid://cxvtf8ti0tt1m" path="res://assets/put_piece.mp3" id="7_87uf6"]
+[ext_resource type="AudioStream" uid="uid://bj07mvict6v7s" path="res://assets/check.mp3" id="8_87uf6"]
+[ext_resource type="AudioStream" uid="uid://df3s7dkvy33qp" path="res://assets/win.mp3" id="9_2a8rs"]
 
 [node name="Game" type="Node2D" unique_id=1638847579]
 process_mode = 1
@@ -22,5 +27,21 @@ zoom = Vector2(5, 5)
 metadata/_edit_use_anchors_ = true
 
 [node name="PauseMenu" parent="CanvasLayer" unique_id=1930855815 instance=ExtResource("4_kelw5")]
-process_mode = 3
 visible = false
+
+[node name="Soundtrack" type="AudioStreamPlayer2D" parent="." unique_id=1088875298]
+stream = ExtResource("5_lfrn8")
+autoplay = true
+parameters/looping = true
+
+[node name="PickUpPiece" type="AudioStreamPlayer2D" parent="." unique_id=1003239685]
+stream = ExtResource("6_bdhmt")
+
+[node name="PutDownPiece" type="AudioStreamPlayer2D" parent="." unique_id=881837152]
+stream = ExtResource("7_87uf6")
+
+[node name="NotifyCheck" type="AudioStreamPlayer2D" parent="." unique_id=1568889781]
+stream = ExtResource("8_87uf6")
+
+[node name="Winning" type="AudioStreamPlayer2D" parent="." unique_id=417420894]
+stream = ExtResource("9_2a8rs")

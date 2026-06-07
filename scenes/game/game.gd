@@ -40,6 +40,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	selected_piece.move_piece(board_clicked_position)
+	$PutDownPiece.play()
 	MovementRules.check_pawn_to_queen(selected_piece)
 	_deselect()
 	_switch_turn()
@@ -71,6 +72,8 @@ func _try_eating(board_clicked_position: Vector2i) -> bool:
 			piece.queue_free()
 			pieces.erase(piece)
 			selected_piece.move_piece(board_clicked_position)
+			$PutDownPiece.play()
+			$Winning.play()
 			MovementRules.check_pawn_to_queen(selected_piece)
 			_deselect()
 			return true
@@ -152,7 +155,7 @@ func _switch_turn() -> void:
 				break
 		if _is_king_in_check(_current_turn, white_king):
 			king_checked.emit(Globals.PIECE_COLORS.WHITE)
-			print("CHECK")
+			$NotifyCheck.play()
 	if _current_turn == Globals.PIECE_COLORS.BLACK:
 		var black_king
 		for piece in pieces:
@@ -161,7 +164,7 @@ func _switch_turn() -> void:
 				break
 		if _is_king_in_check(_current_turn, black_king):
 			king_checked.emit(Globals.PIECE_COLORS.BLACK)
-			print("CHECK")
+			$NotifyCheck.play()
 
 
 func _is_king_in_check(king_color: int, king: Piece) -> bool:
@@ -227,6 +230,7 @@ func _on_piece_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, piec
 
 		selected_piece = piece
 		selected_piece.modulate = Color.GREEN
+		$PickUpPiece.play()
 
 		_valid_moves = _get_valid_moves_for(selected_piece)
 		queue_redraw()    

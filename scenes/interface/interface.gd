@@ -6,8 +6,8 @@ extends Control
 @onready var turn_label = $MarginContainer/VBoxContainer/Turn
 @onready var check_label = $MarginContainer/VBoxContainer/Check
 
-var _white_time := 10 # 180
-var _black_time := 10 # 180
+var _white_time := 180
+var _black_time := 180
 
 
 func _ready() -> void:
