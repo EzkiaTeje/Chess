@@ -3,6 +3,9 @@ class_name Globals
 extends Node
 
 
+const CELL_SIZE = 16
+const TOTAL_PIECES = 32
+
 enum PIECE_COLORS {
 	BLACK,
 	WHITE
@@ -16,9 +19,6 @@ enum PIECE_TYPES {
 	KING,
 	QUEEN
 }
-
-const CELL_SIZE = 16
-const TOTAL_PIECES = 32
 
 const STARTING_POSITIONS = [
 	# BLACK TOP
